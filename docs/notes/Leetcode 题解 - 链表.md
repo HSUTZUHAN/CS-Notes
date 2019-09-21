@@ -44,7 +44,7 @@ B:    b1 → b2 → b3        e1 → e2
 
 设 A 的长度为 a + c，B 的长度为 b + c，其中 c 为尾部公共部分长度，可知 a + c + b = b + c + a。
 
-当访问 A 链表的指针访问到链表尾部时，令它从链表 B 的头部开始访问链表 B；同样地，当访问 B 链表的指针访问到链表尾部时，令它从链表 A 的头部开始访问链表 A。这样就能控制访问 A 和 B 两个链表的指针能同时访问到交点。
+当访问 A 链表的指针访问到链表尾部时（a + c），令它从链表 B 的头部开始访问链表 B（b）；同样地，当访问 B 链表的指针访问到链表尾部时（b+c），令它从链表 A 的头部开始访问链表 A （a）。这样就能控制访问 A 和 B 两个链表的指针能同时访问到交点。
 
 如果不存在交点，那么 a + b = b + a，以下实现代码中 l1 和 l2 会同时为 null，从而退出循环。
 
@@ -59,16 +59,31 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
 }
 ```
 
-如果只是判断是否存在交点，那么就是另一个问题，即 [编程之美 3.6]() 的问题。有两种解法：
-
+如果只是判断是否存在交点，那么就是另一个问题，即 [编程之美 3.6]() 的问题。有两种解法：（如果第一个链表本身就是有环的，那么怎么找结尾？我认为这俩个方法只能在两条链表原本都无环的情况下使用）
 - 把第一个链表的结尾连接到第二个链表的开头，看第二个链表是否存在环；
 - 或者直接比较两个链表的最后一个节点是否相同。
 
+其他途径思路：判断两个单链表是否有环并求交点(https://blog.csdn.net/u014574317/article/details/78533809)
+
 #  2. 链表反转
 
-[206. Reverse Linked List (Easy)](https://leetcode.com/problems/reverse-linked-list/description/)
+[206. Reverse Linked List (Easy)](https://leetcode-cn.com/problems/reverse-linked-list/)
 
-递归
+递归法
+以 1 → 2 → 3 → 4 为例，最后一步，在其他节点都已反转除了首节点:  
+
+```html
+ 1 → 4 → 3 → 2 
+ ↓   ↓       ↓
+head newHead next
+```
+临界条件：head.next == null,即原链表的尾节点变成newHead，每次递归都return 以newHead为首节点，next为尾节点的链表。
+为什么从尾到头反转？
+```html
+ 1 ← 2  3 → 4  链表断了（每个节点只能有一个指出去的箭头）
+
+ 1 → 2 → 3 ← 4  链表没断
+```
 
 ```java
 public ListNode reverseList(ListNode head) {
@@ -81,10 +96,41 @@ public ListNode reverseList(ListNode head) {
     head.next = null;
     return newHead;
 }
+
 ```
+迭代法
+head是当前链表的首节点，first一直是原链表的首节点，target是准备被放到首节点的点
+```html
+ head → ... → first → target → next...  
+↓
+ head → ... → first     →      next...  
+                            ↗
+                      target
+↓
+ head → ... → first     →      next...  
+   ↑                  
+ target
+```
+```java
+    public ListNode reverseList(ListNode head) {
+        if(head == null) return null;
+        ListNode first = head;
+        ListNode target = head.next;
+        while(target != null)
+        {
+            first.next  = target.next;
+            target.next = head;
+            head = target;
+            target = first.next;
+        }
+        return head;
+    }
+```
+
 
 头插法
 
+新建一个头节点，然后将原链表从头到尾插入新建的头节点后面(head.next)
 ```java
 public ListNode reverseList(ListNode head) {
     ListNode newHead = new ListNode(-1);
