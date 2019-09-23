@@ -163,7 +163,8 @@ public ListNode reverseList(ListNode head) {
 #  3. 归并两个有序的链表
 
 [21. Merge Two Sorted Lists (Easy)](https://leetcode.com/problems/merge-two-sorted-lists/description/)
-
+（疑问：这是不是默认非递减排序）
+1、递归
 ```java
 public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
     if (l1 == null) return l2;
@@ -175,6 +176,34 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
         l2.next = mergeTwoLists(l1, l2.next);
         return l2;
     }
+}
+```
+2、非递归
+```java
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode newHead = new ListNode(-1);
+         ListNode curr = newHead;//指向已重新排序链表的尾节点
+        while(l1!= null && l2!=null)
+        {
+            if(l1.val <= l2.val)
+            {
+                curr.next = l1;
+                l1 = l1.next;
+                curr = curr.next;
+            }else            
+            {
+                curr.next = l2;
+                l2 = l2.next;
+                curr = curr.next;
+            }
+                
+        }
+        //把剩下的整条连上就行，已经排好序了
+        if(l1 != null)
+            curr.next = l1;
+        else
+            curr.next = l2;
+        return newHead.next;
 }
 ```
 
